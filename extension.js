@@ -57,6 +57,18 @@ class AirAlertIndicator extends PanelMenu.Button {
         // Подписываемся на изменение настройки мигания
         this._blinkingSettingChangedId = settings.connect('changed::enable-blinking', 
             () => this._onBlinkingSettingChanged());
+
+        // Добавляем обработчик изменения настройки отображения списка тревог
+        this._showAllAlertsChangedId = settings.connect('changed::show-all-alerts', 
+            async () => {
+                try {
+                    const response = await this._makeRequest(API_URL);
+                    const data = JSON.parse(response);
+                    this._updateActiveAlerts(data);
+                } catch (error) {
+                    log(`Error updating alerts list: ${error.message}`);
+                }
+            });
     }
 
     _createMenu() {
@@ -66,6 +78,16 @@ class AirAlertIndicator extends PanelMenu.Button {
             can_focus: false
         });
         this.menu.addMenuItem(this.statusItem);
+
+        // Разделитель перед списком тревог
+        this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
+
+        // Элемент для списка активных тревог
+        this.activeAlertsItem = new PopupMenu.PopupBaseMenuItem({
+            reactive: false,
+            can_focus: false
+        });
+        this.menu.addMenuItem(this.activeAlertsItem);
     }
 
     _startMonitoring() {
@@ -98,6 +120,7 @@ class AirAlertIndicator extends PanelMenu.Button {
             if (regionStatus) {
                 const isAlert = regionStatus.alertnow;
                 this._updateStatus(isAlert, regionStatus);
+                this._updateActiveAlerts(data);
             } else {
                 this._setError(_('Регіон не знайдено'));
             }
@@ -196,7 +219,7 @@ class AirAlertIndicator extends PanelMenu.Button {
 
         // Добавляем время в вертикальный бокс
         if (data.changed) {
-            // Созд��ем горизонтальный бокс для иконки и времени
+            // Создаем горизонтальный бокс для иконки и времени
             const timeBox = new St.BoxLayout({
                 style_class: 'popup-menu-item-box'
             });
@@ -342,6 +365,47 @@ class AirAlertIndicator extends PanelMenu.Button {
         this._notificationSource.showNotification(notification);
     }
 
+    _updateActiveAlerts(data) {
+        if (!settings.get_boolean('show-all-alerts')) {
+            this.activeAlertsItem.actor.hide();
+            return;
+        }
+
+        const activeAlerts = [];
+        for (const [region, status] of Object.entries(data.states)) {
+            if (status.alertnow) {
+                activeAlerts.push(region);
+            }
+        }
+
+        if (activeAlerts.length > 0) {
+            const box = new St.BoxLayout({
+                vertical: true,
+                style_class: 'active-alerts-box'
+            });
+
+            const titleLabel = new St.Label({
+                text: _('Поточні тривоги:'),
+                style_class: 'active-alerts-title'
+            });
+            box.add_child(titleLabel);
+
+            activeAlerts.forEach(region => {
+                const label = new St.Label({
+                    text: `• ${region}`,
+                    style_class: 'active-alerts-item'
+                });
+                box.add_child(label);
+            });
+
+            this.activeAlertsItem.actor.remove_all_children();
+            this.activeAlertsItem.actor.add_child(box);
+            this.activeAlertsItem.actor.show();
+        } else {
+            this.activeAlertsItem.actor.hide();
+        }
+    }
+
     destroy() {
         // Очищаем все таймеры
         if (this._timeout) {
@@ -369,6 +433,12 @@ class AirAlertIndicator extends PanelMenu.Button {
         if (this._notificationSource) {
             this._notificationSource.destroy();
             this._notificationSource = null;
+        }
+
+        // Отключаем обработчик при уничтожении
+        if (this._showAllAlertsChangedId) {
+            settings.disconnect(this._showAllAlertsChangedId);
+            this._showAllAlertsChangedId = null;
         }
 
         super.destroy();

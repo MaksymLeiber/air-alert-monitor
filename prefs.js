@@ -26,7 +26,7 @@ const REGIONS = [
     'Харківська область',
     'Херсонська область',
     'Хмельницька область',
-    'Черкаська область',
+    'Черкаська облас��ь',
     'Чернівецька область',
     'Чернігівська область',
     'м. Київ'
@@ -102,7 +102,7 @@ function fillPreferencesWindow(window) {
     });
     
     const notifyGroup = new Adw.PreferencesGroup({
-        title: 'Налаштування сповіщень'
+        title: 'Налаштування сповiщень'
     });
     notifyPage.add(notifyGroup);
 
@@ -142,7 +142,7 @@ function fillPreferencesWindow(window) {
 
     osdRow.add_suffix(osdSwitch);
 
-    // Добавляем переключатель для ��вука
+    // Добавляем переключатель для звука
     const soundRow = new Adw.ActionRow({
         title: 'Звукові сповіщення',
         subtitle: 'Програвати звук при зміні статусу тривоги',
@@ -159,6 +159,25 @@ function fillPreferencesWindow(window) {
     });
 
     soundRow.add_suffix(soundSwitch);
+
+    // В группу уведомлений добавляем новый переключатель
+    const allAlertsRow = new Adw.ActionRow({
+        title: 'Список активних тривог',
+        subtitle: 'Показувати список усіх областей, де зараз тривога',
+        icon_name: 'view-list-symbolic'
+    });
+
+    const allAlertsSwitch = new Gtk.Switch({
+        active: settings.get_boolean('show-all-alerts'),
+        valign: Gtk.Align.CENTER,
+    });
+
+    allAlertsSwitch.connect('notify::active', (widget) => {
+        settings.set_boolean('show-all-alerts', widget.get_active());
+    });
+
+    allAlertsRow.add_suffix(allAlertsSwitch);
+    notifyGroup.add(allAlertsRow);
 
     notifyGroup.add(blinkingRow);
     notifyGroup.add(osdRow);

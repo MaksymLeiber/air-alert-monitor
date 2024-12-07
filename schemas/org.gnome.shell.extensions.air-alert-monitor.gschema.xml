@@ -27,5 +27,10 @@
       <summary>Enable sound notifications</summary>
       <description>Play sound when alert status changes</description>
     </key>
+    <key name="show-all-alerts" type="b">
+      <default>true</default>
+      <summary>Show all active alerts</summary>
+      <description>Show list of all regions with active air alerts</description>
+    </key>
   </schema>
 </schemalist> 
