@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema id="org.gnome.shell.extensions.air-alert-monitor" path="/org/gnome/shell/extensions/air-alert-monitor/">
+    <key name="selected-region" type="s">
+      <default>'Київська область'</default>
+      <summary>Selected region</summary>
+      <description>The region to monitor for air alerts</description>
+    </key>
+    <key name="refresh-interval" type="i">
+      <range min="5" max="60"/>
+      <default>30</default>
+      <summary>Refresh interval</summary>
+      <description>How often to check for updates (in seconds)</description>
+    </key>
+    <key name="enable-blinking" type="b">
+      <default>true</default>
+      <summary>Enable icon blinking</summary>
+      <description>Enable or disable icon blinking during alerts</description>
+    </key>
+    <key name="enable-osd" type="b">
+      <default>true</default>
+      <summary>Enable OSD notifications</summary>
+      <description>Show on-screen notifications when alert status changes</description>
+    </key>
+    <key name="enable-sound" type="b">
+      <default>true</default>
+      <summary>Enable sound notifications</summary>
+      <description>Play sound when alert status changes</description>
+    </key>
+  </schema>
+</schemalist> 
