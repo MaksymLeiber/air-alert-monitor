@@ -326,7 +326,10 @@ class AirAlertIndicator extends PanelMenu.Button {
             return;
         }
 
-        const soundFile = type === 'alert' ? 'male_air_on.wav' : 'male_air_off.wav';
+        const voiceType = settings.get_string('voice-type');
+        const soundFile = type === 'alert' ? 
+            `${voiceType}_air_on.wav` : 
+            `${voiceType}_air_off.wav`;
         const soundPath = GLib.build_filenamev([Me.path, 'res', soundFile]);
 
         try {
@@ -337,7 +340,6 @@ class AirAlertIndicator extends PanelMenu.Button {
             }, null);
         } catch (e) {
             log(`Failed to play sound: ${e.message}`);
-            // Fallback to paplay if GSound fails
             try {
                 GLib.spawn_command_line_async(`paplay "${soundPath}"`);
             } catch (e2) {
@@ -347,20 +349,25 @@ class AirAlertIndicator extends PanelMenu.Button {
     }
 
     _showNotification(title, message, type = 'alert') {
-        // Создаем источник уведомлений если его еще нет
         if (!this._notificationSource) {
             this._notificationSource = new MessageTray.Source('Air Alert Monitor',
-                                                            type === 'alert' ? 'dialog-warning-symbolic' : 'dialog-information-symbolic');
-            // Добавляем источник в трей уведомлений
+                type === 'alert' ? 'dialog-warning-symbolic' : 'dialog-information-symbolic');
+            
             Main.messageTray.add(this._notificationSource);
         }
 
         // Создаем уведомление
-        const notification = new MessageTray.Notification(this._notificationSource, title, message);
-        
-        // Делаем уведомление срочным для тревоги
-        notification.setUrgency(type === 'alert' ? MessageTray.Urgency.CRITICAL : MessageTray.Urgency.NORMAL);
-        
+        const notification = new MessageTray.Notification(
+            this._notificationSource, 
+            title, 
+            message
+        );
+
+        // Устанавливаем срочность
+        notification.setUrgency(
+            type === 'alert' ? MessageTray.Urgency.CRITICAL : MessageTray.Urgency.NORMAL
+        );
+
         // Показываем уведомление
         this._notificationSource.showNotification(notification);
     }

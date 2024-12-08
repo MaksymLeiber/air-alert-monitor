@@ -26,7 +26,7 @@ const REGIONS = [
     'Харківська область',
     'Херсонська область',
     'Хмельницька область',
-    'Черкаська облас��ь',
+    'Черкаська облась',
     'Чернівецька область',
     'Чернігівська область',
     'м. Київ'
@@ -102,7 +102,7 @@ function fillPreferencesWindow(window) {
     });
     
     const notifyGroup = new Adw.PreferencesGroup({
-        title: 'Налаштування сповiщень'
+        title: 'Налашт��вання сповiщень'
     });
     notifyPage.add(notifyGroup);
 
@@ -206,7 +206,8 @@ function fillPreferencesWindow(window) {
     });
 
     alertOnButton.connect('clicked', () => {
-        const soundPath = GLib.build_filenamev([Me.path, 'res', 'male_air_on.wav']);
+        const voiceType = settings.get_string('voice-type');
+        const soundPath = GLib.build_filenamev([Me.path, 'res', `${voiceType}_air_on.wav`]);
         try {
             soundContext.play_full({
                 'media.filename': soundPath,
@@ -239,7 +240,8 @@ function fillPreferencesWindow(window) {
     });
 
     alertOffButton.connect('clicked', () => {
-        const soundPath = GLib.build_filenamev([Me.path, 'res', 'male_air_off.wav']);
+        const voiceType = settings.get_string('voice-type');
+        const soundPath = GLib.build_filenamev([Me.path, 'res', `${voiceType}_air_off.wav`]);
         try {
             soundContext.play_full({
                 'media.filename': soundPath,
@@ -258,6 +260,30 @@ function fillPreferencesWindow(window) {
 
     alertOffTestRow.add_suffix(alertOffButton);
     soundTestGroup.add(alertOffTestRow);
+
+    // В группу звуковых настроек добавляем выбор голоса
+    const voiceRow = new Adw.ActionRow({
+        title: 'Голос сповіщень',
+        subtitle: 'Виберіть голос для звукових сповіщень',
+        icon_name: 'audio-input-microphone-symbolic'
+    });
+
+    const voiceModel = new Gtk.StringList();
+    voiceModel.append('Чоловічий');
+    voiceModel.append('Жіночий');
+
+    const voiceDropdown = new Gtk.DropDown({
+        model: voiceModel,
+        selected: settings.get_string('voice-type') === 'male' ? 0 : 1,
+        valign: Gtk.Align.CENTER
+    });
+
+    voiceDropdown.connect('notify::selected', (widget) => {
+        settings.set_string('voice-type', widget.selected === 0 ? 'male' : 'female');
+    });
+
+    voiceRow.add_suffix(voiceDropdown);
+    notifyGroup.add(voiceRow);
 
     // Добавляем страницы в окно
     window.add(mainPage);

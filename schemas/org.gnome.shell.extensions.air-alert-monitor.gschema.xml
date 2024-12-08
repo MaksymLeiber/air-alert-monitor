@@ -32,5 +32,10 @@
       <summary>Show all active alerts</summary>
       <description>Show list of all regions with active air alerts</description>
     </key>
+    <key name="voice-type" type="s">
+      <default>'male'</default>
+      <summary>Voice type for alerts</summary>
+      <description>Select voice type (male/female) for alert sounds</description>
+    </key>
   </schema>
 </schemalist> 

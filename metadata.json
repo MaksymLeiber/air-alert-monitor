@@ -4,7 +4,7 @@
     "description": "Моніторинг повітряних тривог в Україні",
     "shell-version": ["42", "43", "44", "45"],
     "url": "https://github.com/MaksymLeiber/air-alert-monitor",
-    "version": 1,
+    "version": 1.2,
     "settings-schema": "org.gnome.shell.extensions.air-alert-monitor",
     "dependencies": ["gir1.2-gsound-1.0"]
 }
