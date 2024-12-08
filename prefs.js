@@ -26,7 +26,7 @@ const REGIONS = [
     'Харківська область',
     'Херсонська область',
     'Хмельницька область',
-    'Черкаська облась',
+    'Черкаська область',
     'Чернівецька область',
     'Чернігівська область',
     'м. Київ'
@@ -95,6 +95,30 @@ function fillPreferencesWindow(window) {
     mainGroup.add(regionRow);
     mainGroup.add(intervalRow);
 
+    
+    const aboutGroup = new Adw.PreferencesGroup({
+        vexpand: true,  
+        valign: Gtk.Align.END  
+    });
+    mainPage.add(aboutGroup);
+
+
+    const infoRow = new Adw.ActionRow({
+        title: `Версія ${Me.metadata.version}`,
+        subtitle: 'Максим Лейбер',
+        icon_name: 'application-x-addon-symbolic'
+    });
+
+    // Добавляем ссылку на GitHub
+    const linkButton = new Gtk.LinkButton({
+        label: '(Banny.dev)',
+        uri: 'https://github.com/MaksymLeiber/air-alert-monitor',
+        valign: Gtk.Align.CENTER
+    });
+
+    infoRow.add_suffix(linkButton);
+    aboutGroup.add(infoRow);
+
     // Создаем вторую страницу для настроек уведомлений
     const notifyPage = new Adw.PreferencesPage({
         title: 'Сповіщення',
@@ -102,7 +126,7 @@ function fillPreferencesWindow(window) {
     });
     
     const notifyGroup = new Adw.PreferencesGroup({
-        title: 'Налашт��вання сповiщень'
+        title: 'Налаштування сповiщень'
     });
     notifyPage.add(notifyGroup);
 
